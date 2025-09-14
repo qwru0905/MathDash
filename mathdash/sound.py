@@ -16,8 +16,6 @@ class GameSound:
     SOUND_DEFAULT = 0.5
     SOUND_STEP = 0.1
 
-    MIN_FMOD_VERSION = 0x00020108
-
     # 모든 GameSound 인스턴스가 공유할 FMOD 시스템
     _system: Optional[fmod.System] = None
 
@@ -76,13 +74,15 @@ class GameSound:
     # ----------------------
     # 위치 관련
     # ----------------------
-    def get_position(self) -> int:
+    @property
+    def position(self) -> int:
         """현재 재생 위치(ms). 채널이 없으면 -1 반환"""
         if not self.channel:
             return -1
         return self.channel.get_position(TIMEUNIT.MS)
 
-    def set_position(self, position: int) -> None:
+    @position.setter
+    def position(self, position: int) -> None:
         """재생 위치를 ms 단위로 이동"""
         if self.channel:
             self.channel.set_position(position, TIMEUNIT.MS)
