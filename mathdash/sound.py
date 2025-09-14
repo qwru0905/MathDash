@@ -79,6 +79,8 @@ class GameSound:
         """현재 재생 위치(ms). 채널이 없으면 -1 반환"""
         if not self.channel:
             return -1
+        if not self.channel.is_playing:
+            return -1
         return self.channel.get_position(TIMEUNIT.MS)
 
     @position.setter

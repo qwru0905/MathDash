@@ -59,20 +59,27 @@ class Note:
         self._radius = int(self._size / 2)
         self._bg_surface = pygame.Surface((self._size, self._size), pygame.SRCALPHA)
         pygame.draw.circle(self._bg_surface, (255, 182, 193), (self._radius, self._radius), self._radius)
-        pygame.draw.circle(self._bg_surface, (0, 0, 0), (self._radius, self._radius), self._radius, 5)
+        pygame.draw.circle(self._bg_surface, (255, 255, 255), (self._radius, self._radius), self._radius, 5)
 
         # 텍스트 배경 + 테두리
         padding = 6
         self._text_bg = pygame.Surface((w + padding*2, h + padding*2), pygame.SRCALPHA)
         bg_color = (255, 255, 200)
-        border_color = (0, 0, 0)
+        border_color = (255, 255, 255)
         border_thickness = 2
         pygame.draw.rect(self._text_bg, bg_color, (0, 0, w + padding*2, h + padding*2))
         pygame.draw.rect(self._text_bg, border_color, (0, 0, w + padding*2, h + padding*2), border_thickness)
         self._text_bg.blit(self._equation, (padding, padding))
 
+    def update(self, time):
+        if time - self._time > 170:
+            return -1
+        self.set_default_pos(time)
+        return 0
+
     def set_default_pos(self, time):
-        self._y = 50 + (self._time - time) * (self._speed*60)/1000
+        self._y = 688 - (self._time - time) * (self._speed*60)/1000
+        # print(self._y, self._time, time, self._speed)
 
     def draw(self, screen):
         # 원형 배경
@@ -81,6 +88,23 @@ class Note:
         # 텍스트
         text_rect = self._text_bg.get_rect(center=(self._x, self._y))
         screen.blit(self._text_bg, text_rect)
+
+    def judge(self, time):
+        diff = abs(time - self._time)
+        if diff <= 50:
+            return 1
+        elif diff <= 100:
+            return 2
+        elif diff <= 150:
+            return 3
+        elif diff <= 170:
+            return 4
+        else:
+            return 0
+
+    @property
+    def num(self):
+        return self._num
 
 
 if __name__ == '__main__':
