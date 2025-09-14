@@ -1,0 +1,154 @@
+{
+  "name": "튜토리얼",
+  "description": "간단한 설명을 합니다",
+  "gimmik": "간단한 덧셈",
+  "difficult": 1,
+  "speed": 5,
+  "start_time": -3000,
+  "equation": [
+    [
+      [
+        {
+          "type": "text",
+          "text": "0"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "1"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "2"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "3"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "4"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "5"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "6"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "7"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "8"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "9"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "type": "text",
+          "text": "0"
+        }
+      ],
+      [
+        {
+          "type": "text",
+          "text": "1"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "1+1"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "1+2"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "2+2"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "2+3"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "3+3"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "3+4"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "4+4"
+        }
+      ],
+      [
+        {
+          "type": "equation",
+          "text": "4+5"
+        }
+      ]
+    ]
+  ],
+  "notes": [
+    {
+      "time": 32000,
+      "num": 5
+    },
+    {
+      "time": 34000,
+      "num": 5
+    },
+    {
+      "time": 36000,
+      "num": 5
+    },
+    {
+      "time": 38000,
+      "num": 5
+    }
+  ],
+  "data": [
+  ]
+}
