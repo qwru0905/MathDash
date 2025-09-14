@@ -4,6 +4,9 @@
 - gimmik: 들어가는 기믹
 - difficult: 난이도 (1~10)
 - equation: 수식 지정
+  - text는 일반 텍스트
+  - equation은 수식 (latex 따라감)
+  - image는 이미지
 - notes: 노트
 - data: 기타 데이터
 - 참고로 notes와 data의 시간이 같으면 data 먼저 처리
