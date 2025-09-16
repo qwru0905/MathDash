@@ -40,6 +40,7 @@ class Stage(ABC):
     def __init__(self):
         self.notes = [[], [], [], [], [], [], [], [], [], []]
         self.now_note = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.now_additional_data = 0
         self.position = 0
         self.music_playing = False
         self.start_time = 0
@@ -112,6 +113,11 @@ class Stage(ABC):
 
         if self.music_playing:
             self.position = self.music.position
+
+        if self.now_additional_data < len(self.additional_data):
+            self.handle_additional_data(self.additional_data[self.now_additional_data])
+            self.now_additional_data += 1
+
         for line_idx, note_line in enumerate(self.notes):
             for note in note_line[self.now_note[line_idx]:]:
                 result = note.update(self.position)
@@ -168,3 +174,6 @@ class Stage(ABC):
                         (is_down != self.input.buttons[b].is_down)
                     self.input.buttons[b].is_down = is_down
 
+    @abstractmethod
+    def handle_additional_data(self, data: dict):
+        pass

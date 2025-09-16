@@ -4,7 +4,7 @@
   "gimmik": "간단한 덧셈",
   "difficult": 1,
   "speed": 5,
-  "start_time": -3000,
+  "start_time": -1000,
   "equation": [
     [
       [
@@ -150,5 +150,101 @@
     }
   ],
   "data": [
+    {
+      "time": 0,
+      "type": "show_text",
+      "text": "안녕하세요.",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 4000,
+      "type": "show_text",
+      "text": "지금부터 MathDash의 기능에 대해 설명드리겠습니다.",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 8000,
+      "type": "show_text",
+      "text": "먼저 이 프로그램의 기초인",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 7000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 12000,
+      "type": "show_text",
+      "text": "노트에 대해 알려드리겠습니다.",
+      "pos": [680, 100],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 16000,
+      "type": "show_text",
+      "text": "노트는 다음과 같이 도형과 숫자로 이루어져 있습니다.",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 20000,
+      "type": "show_text",
+      "text": "이 노트가 판정선에 도달할때,",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 7000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 24000,
+      "type": "show_text",
+      "text": "올바른 숫자를 입력하시면 됩니다.",
+      "pos": [680, 100],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    },
+    {
+      "time": 28000,
+      "type": "show_text",
+      "text": "그럼 한번 직접 해보세요!",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    }
   ]
 }
