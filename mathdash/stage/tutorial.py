@@ -1,5 +1,5 @@
 import json
-from .stage import *
+from .base import *
 
 
 class TutorialStage(Stage):
