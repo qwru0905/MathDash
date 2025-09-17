@@ -1,2 +1,2 @@
-from . import stage
-from . import tutorial
+from .base import Stage, GameInfo, LoadInfo
+from .tutorial import TutorialStage

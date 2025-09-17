@@ -2,11 +2,11 @@ import random
 
 import pygame
 
-from mathdash.note import Note
-from mathdash.sound import GameSound
+from mathdash.core.note import Note
+from mathdash.core.sound import GameSound
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
-from mathdash.input import Input
+from abc import ABC
+from mathdash.core.input import Input
 
 
 @dataclass(frozen=True)
