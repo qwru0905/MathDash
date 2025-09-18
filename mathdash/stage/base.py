@@ -85,7 +85,7 @@ class Stage(ABC):
                 if data_item["type"] == "change_phase":
                     now_phase = data_item["phase"]
                 else:
-                    self.additional_data.append(data_item)
+                    self.handle_additional_data(data_item)
 
                 data_index += 1
                 next_data_time = self.data["data"][data_index]["time"] \
@@ -113,10 +113,6 @@ class Stage(ABC):
 
         if self.music_playing:
             self.position = self.music.position
-
-        if self.now_additional_data < len(self.additional_data):
-            self.handle_additional_data(self.additional_data[self.now_additional_data])
-            self.now_additional_data += 1
 
         for line_idx, note_line in enumerate(self.notes):
             for note in note_line[self.now_note[line_idx]:]:
