@@ -1,10 +1,4 @@
 {
-  "name": "튜토리얼",
-  "description": "간단한 설명을 합니다",
-  "gimmik": "간단한 덧셈",
-  "difficult": 1,
-  "speed": 5,
-  "start_time": -1000,
   "equation": [
     [
       [
@@ -149,19 +143,53 @@
       "num": 5
     }
   ],
-  "data": [
+  "settings":
+  {
+    "name": "튜토리얼",
+    "description": "간단한 설명을 합니다",
+    "gimmik": "간단한 덧셈",
+    "artist": "qwru0905",
+    "song": "tutorial",
+    "difficult": 1,
+    "speed": 5,
+    "start_time": -1000,
+    "file_name": "music.wav"
+  },
+  "actions": [
     {
       "time": 0,
-      "type": "show_text",
-      "text": "안녕하세요.",
-      "pos": [680, 50],
-      "color": [255, 255, 255],
-      "duration": 3000,
-      "fade": {
-        "in": 500,
-        "out": 500
-      }
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text1",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
     },
+    {
+      "time": 3500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text1",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    }
+  ],
+  "decorations": [
+    {
+      "type": "text",
+      "text": "안녕하세요.",
+      "tag": "text1",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    }
+  ],
+
+  "이거는 걍 안쓰는데 지우면 안되는 데이터 넣어놓은거임": [
     {
       "time": 4000,
       "type": "show_text",
