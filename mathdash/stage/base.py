@@ -1,7 +1,9 @@
 import random
 
 import pygame
+from easing_functions import *
 
+from mathdash.core.ease import make_ease
 from mathdash.core.note import Note
 from mathdash.core.sound import GameSound
 from dataclasses import dataclass
@@ -49,11 +51,12 @@ class Stage(ABC):
         self.music: GameSound | None = None
         self._info: GameInfo | None = None
         self.input = Input()
-        self.additional_data = []
+        self.actions = []
 
         # decorations 관리
         self.decorations: list = []    # 모든 데코
         self.tag_map: dict[str, list] = {}  # 태그 → 데코들
+        self.progress_action: list = []
 
         # JSON 로드
         import json
@@ -77,8 +80,6 @@ class Stage(ABC):
 
         font = pygame.font.SysFont("malgungothic", 30)
 
-        font = pygame.font.SysFont("malgungothic", 30)
-
         for dec in self.data.get("decorations", []):
             if dec["type"] == "text":
                 # 색상 hex → RGB
@@ -96,11 +97,11 @@ class Stage(ABC):
                     "tags": tags,
                     "surface": surface,
                     "pos": tuple(dec.get("pos", (0, 0))),
+                    "pos_offset": [0, 0],
                     "rotation": dec.get("rotation", 0),
                     "scale": dec.get("scale", [100, 100]),
                     "depth": dec.get("depth", 0),
-                    "opacity": dec.get("opacity", 100),
-                    "text": dec["text"]
+                    "opacity": dec.get("opacity", 100)
                 }
 
                 # 전체 리스트에 추가
@@ -142,6 +143,8 @@ class Stage(ABC):
                 action_item = self.data["actions"][action_index]
                 if action_item["type"] == "change_phase":
                     now_phase = action_item["phase"]
+                elif action_item["type"] in ["move_decorations"]:
+                    self.actions.append(action_item)
                 else:
                     self.handle_action(action_item)
 
@@ -153,8 +156,19 @@ class Stage(ABC):
 
         load_info.complete = True
 
-    def find_decorations_by_tag(self, tag: str):
-        return self.tag_map.get(tag, [])
+    def find_decorations_by_tag(self, tags: str | list[str]):
+        # tags가 문자열이면 공백 split
+        if isinstance(tags, str):
+            tags = tags.split()
+
+        result = []
+        seen = set()  # 중복 방지
+        for tag in tags:
+            for deco in self.tag_map.get(tag, []):
+                if id(deco) not in seen:
+                    seen.add(id(deco))
+                    result.append(deco)
+        return result
 
     def start(self):
         if self.start_time >= 0:
@@ -164,6 +178,7 @@ class Stage(ABC):
         self.position = self.start_time
 
     def update(self, delta_time):
+        # ====== 음악 position 갱신 ======
         if self.start_time < 0 and not self.music_playing:
             if self.position < 0:
                 self.position += delta_time * 1000
@@ -175,12 +190,99 @@ class Stage(ABC):
         if self.music_playing:
             self.position = self.music.position
 
+        now = self.position
+
+        # ====== 새로운 actions 시작 처리 ======
+        pending_remove = []
+        for act in self.actions:
+            if act["type"] == "move_decorations" and act["time"] <= now:
+                for dec in self.find_decorations_by_tag(act["tag"]):
+                    # pos_offset X 처리
+                    if act.get("pos_offset") and act["pos_offset"][0] is not None:
+                        if act["ease"] == "linear":
+                            ease = make_ease(
+                                act.get("ease", "linear"),
+                                dec.get("pos_offset", [0, 0])[0],  # 시작값
+                                act["pos_offset"][0],  # 끝값
+                                act["duration"]
+                            )
+                            self.progress_action.append({
+                                "dec": dec,
+                                "key": "pos_offset[0]",
+                                "ease": ease,
+                                "start_time": act["time"]
+                            })
+
+                    # pos_offset Y 처리
+                    if act.get("pos_offset") and act["pos_offset"][1] is not None:
+                        if act["ease"] == "linear":
+                            ease = make_ease(
+                                act.get("ease", "linear"),
+                                dec.get("pos_offset", [0, 0])[1],
+                                act["pos_offset"][1],
+                                act["duration"]
+                            )
+                            self.progress_action.append({
+                                "dec": dec,
+                                "key": "pos_offset[1]",
+                                "ease": ease,
+                                "start_time": act["time"]
+                            })
+
+                    # opacity 처리
+                    if "opacity" in act:
+                        if act["ease"] == "linear":
+                            ease = make_ease(
+                                act.get("ease", "linear"),
+                                dec.get("opacity", 100),
+                                act["opacity"],
+                                act["duration"]
+                            )
+                            self.progress_action.append({
+                                "dec": dec,
+                                "key": "opacity",
+                                "ease": ease,
+                                "start_time": act["time"]
+                            })
+
+                pending_remove.append(act)
+
+        # 실행한 action은 제거
+        for act in pending_remove:
+            self.actions.remove(act)
+
+        # ====== 진행 중인 progress_action 업데이트 ======
+        alive_actions = []
+        for pa in self.progress_action:
+            dec = pa["dec"]
+            ease = pa["ease"]
+            start_time = pa["start_time"]
+            key = pa["key"]
+
+            t = now - start_time
+            if 0 <= t <= ease.duration:
+                value = ease(t)
+                if key == "pos_offset[0]":
+                    if "pos_offset" not in dec:
+                        dec["pos_offset"] = [0, 0]
+                    dec["pos_offset"][0] = value
+                elif key == "pos_offset[1]":
+                    if "pos_offset" not in dec:
+                        dec["pos_offset"] = [0, 0]
+                    dec["pos_offset"][1] = value
+                elif key == "opacity":
+                    dec["opacity"] = value
+                alive_actions.append(pa)
+        self.progress_action = alive_actions
+
+        # ====== 노트 업데이트 ======
         for line_idx, note_line in enumerate(self.notes):
             for note in note_line[self.now_note[line_idx]:]:
                 result = note.update(self.position)
-                if result == -1:  # 노트 처리 완료
+                if result == -1:  # 노트 끝남
                     self.now_note[line_idx] += 1
 
+        # ====== 입력 처리 ======
         for btn_idx, btn in enumerate(self.input.buttons):
             if btn.changed and btn.is_down:
                 if btn_idx < len(self.notes) and self.now_note[btn_idx] < len(self.notes[btn_idx]):
@@ -191,33 +293,45 @@ class Stage(ABC):
                     result = 0
                 print(self.result_map.get(result, "너 뭐함"))
 
+    # 장식 (depth 순서대로)
     def draw(self, screen):
         screen.fill((30, 30, 30))
         pygame.draw.circle(screen, (0, 0, 0), (680, 688), 40)
 
+        # ===== 노트 =====
         for line_idx, note_line in enumerate(self.notes):
             note_idx = self.now_note[line_idx]
             if note_idx >= len(note_line):
                 continue
-
             for note in note_line[note_idx:]:
                 note.draw(screen)
 
-        # 장식 (depth 순서대로)
+        # ===== 장식 (depth 순서대로) =====
         for deco in sorted(self.decorations, key=lambda d: d["depth"]):
             surface = deco["surface"]
-            x, y = deco["pos"]
 
-            # 회전
-            if deco["rotation"]:
+            # --- opacity 적용 ---
+            if "opacity" in deco:
+                surface.set_alpha(int(deco.get("opacity", 100) * 2.55))
+
+            # --- 회전 ---
+            if deco.get("rotation"):
                 surface = pygame.transform.rotate(surface, deco["rotation"])
-            # 스케일
-            if deco["scale"] != [100, 100]:
+
+            # --- 스케일 ---
+            if deco.get("scale"):
                 w, h = surface.get_size()
                 surface = pygame.transform.smoothscale(
                     surface,
                     (int(w * deco["scale"][0] / 100), int(h * deco["scale"][1] / 100))
                 )
+
+            # --- 위치 (pos + pos_offset) ---
+            x, y = deco.get("pos", (0, 0))
+            if "pos_offset" in deco:
+                ox, oy = deco["pos_offset"]
+                x += ox or 0
+                y += oy or 0
 
             rect = surface.get_rect(center=(x, y))
             screen.blit(surface, rect)
