@@ -1,10 +1,4 @@
 {
-  "name": "튜토리얼",
-  "description": "간단한 설명을 합니다",
-  "gimmik": "간단한 덧셈",
-  "difficult": 1,
-  "speed": 5,
-  "start_time": -3000,
   "equation": [
     [
       [
@@ -149,6 +143,290 @@
       "num": 5
     }
   ],
-  "data": [
+  "settings":
+  {
+    "name": "튜토리얼",
+    "description": "간단한 설명을 합니다",
+    "gimmik": "간단한 덧셈",
+    "artist": "qwru0905",
+    "song": "tutorial",
+    "difficult": 1,
+    "speed": 5,
+    "start_time": -1000,
+    "file_name": "music.wav"
+  },
+  "actions": [
+    {
+      "time": 0,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text1",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 3500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text1",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    },
+    {
+      "time": 4000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text2",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 7500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text2",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    },
+    {
+      "time": 8000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text3-0",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 12000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text3-1",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 15500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text3",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    },
+    {
+      "time": 16000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text4 ex1",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 19500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text4",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    },
+    {
+      "time": 20000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text5-0",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 20000,
+      "type": "move_decorations",
+      "duration": 4000,
+      "tag": "ex1note",
+      "pos_offset": [null, 500],
+      "opacity": null,
+      "ease": "linear"
+    },
+    {
+      "time": 24000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text5-1",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 24000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "ex1note",
+      "pos_offset": [null, null],
+      "scale": [150, 150],
+      "opacity": 0,
+      "ease": "sinein"
+    },
+    {
+      "time": 27500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text5 ex1",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    },
+    {
+      "time": 28000,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text6",
+      "pos_offset": [null, null],
+      "opacity": 100,
+      "ease": "linear"
+    },
+    {
+      "time": 31500,
+      "type": "move_decorations",
+      "duration": 500,
+      "tag": "text6",
+      "pos_offset": [null, null],
+      "opacity": 0,
+      "ease": "linear"
+    }
+  ],
+  "decorations": [
+    {
+      "type": "text",
+      "text": "안녕하세요.",
+      "tag": "text1",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "지금부터 MathDash의 기능에 대해 설명드리겠습니다.",
+      "tag": "text2",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "먼저 이 프로그램의 기초인",
+      "tag": "text3 text3-0",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "노트에 대해 알려드리겠습니다.",
+      "tag": "text3 text3-1",
+      "pos": [680, 100],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "노트는 다음과 같이 도형과 숫자로 이루어져 있습니다.",
+      "tag": "text4",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "image",
+      "path": "judgement_line.png",
+      "tag": "ex1 ex1judge",
+      "pos": [1050, 650],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -90
+    },
+    {
+      "type": "image",
+      "path": "note.png",
+      "tag": "ex1 ex1note",
+      "pos": [1050, 150],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -91
+    },
+    {
+      "type": "text",
+      "text": "이 노트가 판정선에 도달할때,",
+      "tag": "text5 text5-0",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "올바른 숫자를 입력하시면 됩니다.",
+      "tag": "text5 text5-1",
+      "pos": [680, 100],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    },
+    {
+      "type": "text",
+      "text": "그럼 한번 직접 해보세요!",
+      "tag": "text6",
+      "pos": [680, 50],
+      "rotation": 0,
+      "scale": [100, 100],
+      "color": "ffffff",
+      "opacity": 0,
+      "depth": -100
+    }
+  ],
+
+  "이거는 걍 안쓰는데 지우면 안되는 데이터 넣어놓은거임": [
+    {
+      "time": 28000,
+      "type": "show_text",
+      "text": "",
+      "pos": [680, 50],
+      "color": [255, 255, 255],
+      "duration": 3000,
+      "fade": {
+        "in": 500,
+        "out": 500
+      }
+    }
   ]
 }

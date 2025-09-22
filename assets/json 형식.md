@@ -8,8 +8,8 @@
   - equation은 수식 (latex 따라감)
   - image는 이미지
 - notes: 노트
-- data: 기타 데이터
-- 참고로 notes와 data의 시간이 같으면 data 먼저 처리
+- data: 기타 데이터 (`change_phase`를 제외하면 스테이지마다 처리하는게 다름)
+- 참고로 phase는 notes와 data의 시간이 같으면 data 먼저 처리
 
 예시 (튜토리얼)
 ```json
