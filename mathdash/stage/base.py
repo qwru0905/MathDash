@@ -54,7 +54,7 @@ class Stage(ABC):
 
         # managers
         self.note_manager = NoteManager()
-        self.dec_manager = DecorationManager()
+        self.dec_manager = DecorationManager(base_path)
         self.act_manager = ActionManager()
 
         # JSON 로드
@@ -158,10 +158,15 @@ class Stage(ABC):
     # 장식 (depth 순서대로)
     def draw(self, screen):
         screen.fill((30, 30, 30))
-        pygame.draw.circle(screen, (0, 0, 0), (680, 688), 40)
+
+        self.dec_manager.draw(screen, before=False)
+
+        pygame.draw.circle(screen, (255, 255, 255), (680, 688), 40, 2)
+        pygame.draw.circle(screen, (0, 0, 0), (680, 688), 38)
 
         self.note_manager.draw(screen)
-        self.dec_manager.draw(screen)
+
+        self.dec_manager.draw(screen, before=True)
 
     def event(self, events):
         for btn in self.input.buttons:

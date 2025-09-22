@@ -1,5 +1,5 @@
 import pygame
-from easing_functions import LinearInOut, SineEaseInOut, QuadEaseOut
+from easing_functions import *
 
 
 # ====== 상수 & 유틸 ======
@@ -29,6 +29,8 @@ def opacity_to_alpha(opacity: float) -> int:
 def make_ease(ease_type: str, start, end, duration):
     if ease_type == "linear":
         return LinearInOut(start, end, duration)
+    elif ease_type == "sinein":
+        return SineEaseIn(start, end, duration)
     elif ease_type == "sineinout":
         return SineEaseInOut(start, end, duration)
     elif ease_type == "quadout":

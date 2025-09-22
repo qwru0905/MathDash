@@ -89,7 +89,7 @@ class ActionManager:
 
                 if pa.key in ["rotation", "opacity"]:
                     setattr(pa.dec, pa.key, value)
-                elif pa.key in ["pos_offset", "scale"] and pa.index:
+                elif pa.key in ["pos_offset", "scale"] and pa.index is not None:
                     getattr(pa.dec, pa.key)[pa.index] = value
 
                 alive.append(pa)
