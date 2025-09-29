@@ -62,7 +62,7 @@ class Stage(ABC):
             self.data = json.load(f)
 
         settings = self.data.get("settings", {})
-        self.music = GameSound(f"{base_path}{settings.get('file_name', 'music.wav')}", loop=True)
+        self.music = GameSound(f"{base_path}{settings.get('file_name', 'music.wav')}", loop=False)
         self._info = GameInfo.from_json(self.data)
         self.start_time = settings.get("start_time", 0)
 

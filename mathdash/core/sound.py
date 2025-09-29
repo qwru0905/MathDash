@@ -38,13 +38,16 @@ class GameSound:
         self.channel = GameSound._system.play_sound(self.sound)
         self._apply_volume()
 
-    def pause(self) -> None:
+    @property
+    def paused(self) -> bool:
         if self.channel:
-            self.channel.paused = True
+            return self.channel.paused
+        return True
 
-    def resume(self) -> None:
+    @paused.setter
+    def paused(self, paused: bool) -> None:
         if self.channel:
-            self.channel.paused = False
+            self.channel.paused = paused
 
     def stop(self) -> None:
         if self.channel:
@@ -86,5 +89,8 @@ class GameSound:
     @position.setter
     def position(self, position: int) -> None:
         """재생 위치를 ms 단위로 이동"""
+        if position < 0:
+            return
+
         if self.channel:
             self.channel.set_position(position, TIMEUNIT.MS)
