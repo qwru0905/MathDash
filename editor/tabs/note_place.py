@@ -68,7 +68,8 @@ myFont = pygame.font.SysFont("arial", 30, True, False)
 # 클래스 상단에 상수 정의
 LANE_WIDTH = 50
 LANE_OFFSET = 25
-NOTE_SCALE = 0.2  # 시간에 따른 y 좌표 스케일
+NOTE_SPEED = 0.2  # 시간에 따른 y 좌표 스케일
+NOTE_RADIUS = 25
 SCROLL_SPEED_KEYBOARD = 300
 SCROLL_SPEED_MOUSE = 100
 NOTE_CENTER_Y = 600
@@ -107,12 +108,39 @@ class NotePlace(Tab):
                 elif e.key == pygame.K_DOWN:
                     self.music.position += SCROLL_SPEED_KEYBOARD
                 elif e.key == pygame.K_SPACE:
-                    print(self.music)
                     self.music.paused = not self.music.paused
 
             # 마우스 휠
             elif e.type == pygame.MOUSEWHEEL:
                 self.music.position -= e.y * SCROLL_SPEED_MOUSE  # y>0이면 위로, y<0이면 아래로
+
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                if e.button == 1:  # 왼쪽 클릭
+                    x, y = e.pos
+                    # 이거 비트 맞춰가주고 다시 짜줘.
+                    beat_interval = 60000 / self.bpm
+                    if LANE_OFFSET < x < LANE_OFFSET + LANE_WIDTH * 10 and 0 < y < 1200:
+                        lane_num = (x - LANE_OFFSET) // LANE_WIDTH
+                        note_time = self.music.position + (NOTE_CENTER_Y - y) / NOTE_SPEED
+                        note_time = round(note_time / beat_interval) * beat_interval
+                        self.notes.append({"num": int(lane_num), "time": int(note_time)})
+                elif e.button == 3:  # 오른쪽 클릭
+                    x, y = e.pos
+                    if LANE_OFFSET < x < LANE_OFFSET + LANE_WIDTH * 10 and 0 < y < 1200:
+                        lane_num = (x - LANE_OFFSET) // LANE_WIDTH
+                        note_time = self.music.position + (NOTE_CENTER_Y - y) / NOTE_SPEED
+                        # 가장 가까운 노트 찾기
+                        closest_note = None
+                        closest_dist = float('inf')
+                        for note in self.notes:
+                            if note["num"] == int(lane_num):
+                                dist = abs(note["time"] - note_time)
+                                if dist < closest_dist:
+                                    closest_dist = dist
+                                    closest_note = note
+                        # 일정 거리 이내면 삭제
+                        if closest_note and closest_dist < 500:  # 500ms 이내
+                            self.notes.remove(closest_note)
 
     def draw(self, surface: pygame.Surface):
         surface.fill((0, 0, 0))
@@ -123,27 +151,31 @@ class NotePlace(Tab):
             pygame.draw.line(surface, (200, 200, 200),
                              (x, 0), (x, height))
 
+        for note in self.notes:
+            # y좌표 계산식 변경
+            y = NOTE_CENTER_Y + (self.music.position - note["time"]) * NOTE_SPEED
+
+            if -NOTE_RADIUS < y < height + NOTE_RADIUS:
+                x = note["num"] * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
+                pygame.draw.circle(surface, (0, 200, 200), (x, int(y)), NOTE_RADIUS)
+
         # 가로선 (BPM 기준)
         if hasattr(self, 'bpm') and self.bpm:
             beat_interval = 60000 / self.bpm
-            start_time = self.music.position - (height-NOTE_CENTER_Y)/NOTE_SCALE
-            end_time = self.music.position + NOTE_CENTER_Y/NOTE_SCALE
+            start_time = self.music.position - (height-NOTE_CENTER_Y) / NOTE_SPEED
+            end_time = self.music.position + NOTE_CENTER_Y / NOTE_SPEED
             current_time = (start_time // beat_interval) * beat_interval
             while current_time <= end_time:
-                y = NOTE_CENTER_Y + (self.music.position - current_time) * NOTE_SCALE
+                y = NOTE_CENTER_Y + (self.music.position - current_time) * NOTE_SPEED
                 pygame.draw.line(surface, (100, 100, 100), (LANE_OFFSET, y), (LANE_OFFSET+LANE_WIDTH*10, y))
                 current_time += beat_interval
 
         pygame.draw.line(surface, (255, 255, 255), (0, NOTE_CENTER_Y), (width, NOTE_CENTER_Y), 3)
 
-        for note in self.notes:
-            # y좌표 계산식 변경
-            y = NOTE_CENTER_Y + (self.music.position - note["time"]) * NOTE_SCALE
+        for i in range(10):
+            x = i * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
+            num_text = myFont.render(str(i), True, (255, 255, 255))
+            surface.blit(num_text, (x - num_text.get_width() / 2, NOTE_CENTER_Y))
 
-            if -25 < y < height + 25:
-                x = note["num"] * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
-                pygame.draw.circle(surface, (0, 200, 200), (x, int(y)), 25)
-
-        text = myFont.render(str(self.music.position), True, (255, 255, 255))
-
-        surface.blit(text, (width/2, 100))
+        position_text = myFont.render(str(self.music.position), True, (255, 255, 255))
+        surface.blit(position_text, (width/2, 100))
