@@ -415,18 +415,16 @@
     }
   ],
 
-  "이거는 걍 안쓰는데 지우면 안되는 데이터 넣어놓은거임": [
+  "bpm": [
     {
-      "time": 28000,
-      "type": "show_text",
-      "text": "",
-      "pos": [680, 50],
-      "color": [255, 255, 255],
-      "duration": 3000,
-      "fade": {
-        "in": 500,
-        "out": 500
-      }
+      "time": 0,
+      "bpm": 120,
+      "time_signature": [4, 4]
+    },
+    {
+      "time": 40000,
+      "bpm": 150,
+      "time_signature": [7, 8]
     }
   ]
 }
