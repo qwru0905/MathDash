@@ -1,7 +1,7 @@
 import threading
 import pygame
 
-from mathdash.stage import TutorialStage, LoadInfo
+from mathdash.stage import *
 
 
 class Game:
@@ -13,7 +13,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # Stage 준비
-        self.tutorial = TutorialStage()
+        self.tutorial = CustomStage()
         self.load_info = LoadInfo()
         threading.Thread(
             target=self.tutorial.load, args=(self.load_info,), daemon=True

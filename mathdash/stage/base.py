@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 import json
@@ -58,11 +59,11 @@ class Stage(ABC):
         self.act_manager = ActionManager()
 
         # JSON 로드
-        with open(f"{base_path}data.json", encoding="utf-8") as f:
+        with open(os.path.join(base_path, "data.json"), encoding="utf-8") as f:
             self.data = json.load(f)
 
         settings = self.data.get("settings", {})
-        self.music = GameSound(f"{base_path}{settings.get('file_name', 'music.wav')}", loop=False)
+        self.music = GameSound(os.path.join(base_path, settings.get('file_name', 'music.wav')), loop=False)
         self._info = GameInfo.from_json(self.data)
         self.start_time = settings.get("start_time", 0)
 

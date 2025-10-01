@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class Tab(ABC):
     @abstractmethod
-    def open_file(self, file_path):
+    def open_file(self, base_path, data):
         pass
 
     @abstractmethod
@@ -15,5 +15,5 @@ class Tab(ABC):
         pass
 
     @abstractmethod
-    def draw(self, surface):
+    def draw(self):
         pass

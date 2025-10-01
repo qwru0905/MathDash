@@ -1,5 +1,4 @@
 import copy
-import json
 import os
 
 import pygame
@@ -69,7 +68,6 @@ myFont = pygame.font.SysFont("arial", 30, True, False)
 # 클래스 상단에 상수 정의
 LANE_WIDTH = 50
 LANE_OFFSET = 25
-NOTE_SPEED = 0.2  # 시간에 따른 y 좌표 스케일
 NOTE_RADIUS = 25
 SCROLL_SPEED_KEYBOARD = 300
 SCROLL_SPEED_MOUSE = 100
@@ -77,7 +75,7 @@ NOTE_CENTER_Y = 600
 
 
 class NotePlace(Tab):
-    def __init__(self):
+    def __init__(self, surface: pygame.Surface):
         self.base_path = None
         self.data: dict | None = None
         self.music: GameSound = NullSound()
@@ -86,12 +84,13 @@ class NotePlace(Tab):
             {"time": 0, "bpm": 120, "time_signature": (4, 4)}
         ]
         self.beat_unit = 4  # 임시
+        self.beat_unit_list = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
+        self.surface = surface
+        self.note_speed = 0.2  # 시간에 따른 y 좌표 스케일
 
-    def open_file(self, file_path):
-        with open(file_path, encoding="utf-8") as f:
-            self.data = json.load(f)
-
-        self.base_path = os.path.dirname(file_path)
+    def open_file(self, base_path, data):
+        self.base_path = base_path
+        self.data = data
         settings = self.data.get("settings", {})
         music_file = settings.get('file_name', 'music.wav')
         music_path = os.path.join(self.base_path, music_file)
@@ -106,7 +105,8 @@ class NotePlace(Tab):
 
     def get_current_bpm(self, position_ms: int) -> dict:
         """현재 위치에 적용되는 bpm/time_signature 반환"""
-        current = copy.deepcopy(self.bpm_changes[0]) if self.bpm_changes else {"time": 0, "bpm": 120, "time_signature": (4, 4)}
+        current = copy.deepcopy(self.bpm_changes[0]) \
+            if self.bpm_changes else {"time": 0, "bpm": 120, "time_signature": (4, 4)}
         for change in self.bpm_changes:
             if position_ms >= change["time"]:
                 current["time"] = change["time"]
@@ -121,11 +121,33 @@ class NotePlace(Tab):
         for e in events:
             # 화살표 위/아래
             if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_UP:
-                    self.music.position -= SCROLL_SPEED_KEYBOARD
-                elif e.key == pygame.K_DOWN:
-                    self.music.position += SCROLL_SPEED_KEYBOARD
-                elif e.key == pygame.K_SPACE:
+                if e.mod & pygame.KMOD_CTRL:
+                    if e.key == pygame.K_UP:
+                        self.note_speed += 0.1
+                    elif e.key == pygame.K_DOWN:
+                        self.note_speed -= 0.1
+                        
+                elif e.mod & pygame.KMOD_SHIFT:
+                    if e.key == pygame.K_DOWN:
+                        idx = self.beat_unit_list.index(self.beat_unit)
+                        if idx > 0:
+                            self.beat_unit = self.beat_unit_list[idx - 1]
+                        else:
+                            self.beat_unit = self.beat_unit_list[-1]
+                    elif e.key == pygame.K_UP:
+                        idx = self.beat_unit_list.index(self.beat_unit)
+                        if idx < len(self.beat_unit_list) - 1:
+                            self.beat_unit = self.beat_unit_list[idx + 1]
+                        else:
+                            self.beat_unit = self.beat_unit_list[0]
+                            
+                else:
+                    if e.key == pygame.K_UP:
+                        self.music.position -= SCROLL_SPEED_KEYBOARD
+                    elif e.key == pygame.K_DOWN:
+                        self.music.position += SCROLL_SPEED_KEYBOARD
+
+                if e.key == pygame.K_SPACE:
                     self.music.paused = not self.music.paused
                 elif e.key == pygame.K_d:
                     print(self.bpm_changes)
@@ -143,7 +165,7 @@ class NotePlace(Tab):
                         lane_num = (x - LANE_OFFSET) // LANE_WIDTH
 
                         # 클릭한 위치의 절대 시간
-                        note_time = self.music.position + (NOTE_CENTER_Y - y) / NOTE_SPEED
+                        note_time = self.music.position + (NOTE_CENTER_Y - y) / self.note_speed
 
                         # note_time 기준으로 bpm 구하기
                         bpm_info = self.get_current_bpm(note_time)
@@ -172,43 +194,38 @@ class NotePlace(Tab):
 
                 elif e.button == 3:  # 오른쪽 클릭
                     x, y = e.pos
+                    y -= 30  # 메뉴바 보정
                     if LANE_OFFSET < x < LANE_OFFSET + LANE_WIDTH * 10 and 0 < y < 1200:
                         lane_num = (x - LANE_OFFSET) // LANE_WIDTH
-                        note_time = self.music.position + (NOTE_CENTER_Y - y) / NOTE_SPEED
-                        # 가장 가까운 노트 찾기
+
                         closest_note = None
                         closest_dist = float('inf')
                         for note in self.notes:
                             if note["num"] == int(lane_num):
-                                dist = abs(note["time"] - note_time)
+                                # 화면에 표시될 y좌표 계산
+                                note_y = NOTE_CENTER_Y + (self.music.position - note["time"]) * self.note_speed
+                                dist = abs(note_y - y)
                                 if dist < closest_dist:
                                     closest_dist = dist
                                     closest_note = note
-                        # 일정 거리 이내면 삭제
-                        if closest_note and closest_dist < 500:  # 500ms 이내
+
+                        # 일정 거리 이내면 삭제 (픽셀 단위)
+                        if closest_note and closest_dist < NOTE_RADIUS * 1.5:
                             self.notes.remove(closest_note)
 
-    def draw(self, surface: pygame.Surface):
-        surface.fill((0, 0, 0))
-        width, height = surface.get_size()
+    def draw(self):
+        self.surface.fill((0, 0, 0))
+        width, height = self.surface.get_size()
 
         for i in range(11):
             x = i * LANE_WIDTH + LANE_OFFSET
-            pygame.draw.line(surface, (200, 200, 200),
+            pygame.draw.line(self.surface, (200, 200, 200),
                              (x, 0), (x, height))
-
-        for note in self.notes:
-            # y좌표 계산식 변경
-            y = NOTE_CENTER_Y + (self.music.position - note["time"]) * NOTE_SPEED
-
-            if -NOTE_RADIUS < y < height + NOTE_RADIUS:
-                x = note["num"] * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
-                pygame.draw.circle(surface, (0, 200, 200), (x, int(y)), NOTE_RADIUS)
 
         # 가로선 (BPM/마디, 변속 반영)
         if hasattr(self, 'bpm_changes') and self.bpm_changes:
-            start_time = self.music.position - (height - NOTE_CENTER_Y) / NOTE_SPEED
-            end_time = self.music.position + NOTE_CENTER_Y / NOTE_SPEED
+            start_time = self.music.position - (height - NOTE_CENTER_Y) / self.note_speed
+            end_time = self.music.position + NOTE_CENTER_Y / self.note_speed
 
             # bpm_changes를 시간순으로 순회
             bpm_list = sorted(self.bpm_changes, key=lambda c: c["time"])
@@ -235,40 +252,60 @@ class NotePlace(Tab):
                     # 박자 단위 선
                     t = current_measure_time
                     while t < current_measure_time + measure_interval and t <= seg_end:
-                        y = NOTE_CENTER_Y + (self.music.position - t) * NOTE_SPEED
-                        pygame.draw.line(surface, (100, 100, 100),
+                        y = NOTE_CENTER_Y + (self.music.position - t) * self.note_speed
+                        pygame.draw.line(self.surface, (100, 100, 100),
                                          (LANE_OFFSET, y),
                                          (LANE_OFFSET + LANE_WIDTH * 10, y))
                         t += beat_interval
 
                     # 마디선
-                    y = NOTE_CENTER_Y + (self.music.position - current_measure_time) * NOTE_SPEED
-                    pygame.draw.line(surface, (180, 180, 180),
+                    y = NOTE_CENTER_Y + (self.music.position - current_measure_time) * self.note_speed
+                    pygame.draw.line(self.surface, (180, 180, 180),
                                      (LANE_OFFSET, y),
                                      (LANE_OFFSET + LANE_WIDTH * 10, y), 2)
 
                     current_measure_time += measure_interval
 
+        for note in self.notes:
+            # y좌표 계산식 변경
+            y = NOTE_CENTER_Y + (self.music.position - note["time"]) * self.note_speed
+
+            if -NOTE_RADIUS < y < height + NOTE_RADIUS:
+                x = note["num"] * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
+                pygame.draw.circle(self.surface, (0, 200, 200), (x, int(y)), NOTE_RADIUS)
+
         # 변속도 선 표시
         if hasattr(self, 'bpm_changes'):
             for bpm_change in self.bpm_changes:
                 t = bpm_change["time"]
-                y = NOTE_CENTER_Y + (self.music.position - t) * NOTE_SPEED
+                y = NOTE_CENTER_Y + (self.music.position - t) * self.note_speed
                 if -50 < y < height + 50:  # 화면 안에 있는 경우만
                     # 세로선
-                    pygame.draw.line(surface, (255, 200, 0),
+                    pygame.draw.line(self.surface, (255, 200, 0),
                                      (LANE_OFFSET, y),
                                      (LANE_OFFSET + LANE_WIDTH * 10, y), 2)
                     # BPM 텍스트
-                    bpm_text = myFont.render(str(bpm_change["bpm"]), True, (255, 200, 0))
-                    surface.blit(bpm_text, (LANE_OFFSET + LANE_WIDTH * 10 + 10, y - bpm_text.get_height() / 2))
+                    bpm_text = myFont.render(
+                        str(bpm_change["bpm"]) + " " +
+                        str(bpm_change["time_signature"][0]) + "/" + str(bpm_change["time_signature"][1]),
+                        True, (255, 200, 0))
+                    self.surface.blit(bpm_text, (LANE_OFFSET + LANE_WIDTH * 10 + 10, y - bpm_text.get_height() / 2))
 
-        pygame.draw.line(surface, (255, 255, 255), (0, NOTE_CENTER_Y), (width, NOTE_CENTER_Y), 3)
+        pygame.draw.line(self.surface, (255, 255, 255),
+                         (LANE_OFFSET, NOTE_CENTER_Y),
+                         (LANE_OFFSET + LANE_WIDTH * 10, NOTE_CENTER_Y),
+                         3)
 
         for i in range(10):
             x = i * LANE_WIDTH + LANE_OFFSET+LANE_WIDTH/2
             num_text = myFont.render(str(i), True, (255, 255, 255))
-            surface.blit(num_text, (x - num_text.get_width() / 2, NOTE_CENTER_Y))
+            self.surface.blit(num_text, (x - num_text.get_width() / 2, NOTE_CENTER_Y))
 
         position_text = myFont.render(str(self.music.position), True, (255, 255, 255))
-        surface.blit(position_text, (width/2, 100))
+        self.surface.blit(position_text, (width / 2, 100))
+
+        beat_unit_text = myFont.render("Beat Unit: " + str(self.beat_unit), True, (255, 255, 255))
+        self.surface.blit(beat_unit_text, (width - beat_unit_text.get_width() - 10, 10))
+
+        note_speed_text = myFont.render(f"Note Speed: {self.note_speed:.1f}", True, (255, 255, 255))
+        self.surface.blit(note_speed_text, (width - note_speed_text.get_width() - 10, 50))
